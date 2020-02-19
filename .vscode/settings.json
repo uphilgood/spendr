@@ -1,0 +1,6 @@
+{
+    "extensions.ignoreRecommendations": false,
+    "window.zoomLevel": 1,
+
+    "eslint.autoFixOnSave": true,
+}
