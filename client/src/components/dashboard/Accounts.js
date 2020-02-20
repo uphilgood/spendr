@@ -1,149 +1,166 @@
-import React, { Component } from "react";
+import React, { useState, useEffect } from "react";
 import PropTypes from "prop-types";
 import PlaidLinkButton from "react-plaid-link-button";
 import { connect } from "react-redux";
+import TransactionsTable from './components/TransactionsTable';
+import CircleProgress from './components/CircleProgress';
 import {
     getTransactions,
     addAccount,
     deleteAccount
 } from "../../actions/accountActions";
 import { logoutUser } from "../../actions/authActions";
-// import MaterialTable from "material-table"; // https://mbrn.github.io/material-table/#/
 
-class Accounts extends Component {
-    componentDidMount() {
-        const { accounts } = this.props;
-        this.props.getTransactions(accounts);
-    }
-    // Add account
-    handleOnSuccess = (token, metadata) => {
-        const { accounts } = this.props;
+
+const Accounts = props => {
+    const { accounts, getTransactions, user, plaid, addAccount, deleteAccount, logoutUser } = props;
+    const { transactions, transactionsLoading } = plaid;
+    const [loaded, setLoaded] = useState();
+
+    useEffect(() => {
+        getTransactions(accounts);
+    }, [])
+
+    const handleOnSuccess = (token, metadata) => {
         const plaidData = {
             public_token: token,
             metadata: metadata,
             accounts: accounts
         };
-        this.props.addAccount(plaidData);
+        addAccount(plaidData);
     };
     // Delete account
-    onDeleteClick = id => {
-        const { accounts } = this.props;
+    const onDeleteClick = id => {
         const accountData = {
             id: id,
             accounts: accounts
         };
-        this.props.deleteAccount(accountData);
+        deleteAccount(accountData);
     };
     // Logout
-    onLogoutClick = e => {
+    const onLogoutClick = e => {
         e.preventDefault();
-        this.props.logoutUser();
+        logoutUser();
     };
-    render() {
-        const { user, accounts } = this.props;
-        const { transactions, transactionsLoading } = this.props.plaid;
-        let accountItems = accounts.map(account => (
-            <li key={account._id} style={{ marginTop: "1rem" }}>
-                <button
-                    style={{ marginRight: "1rem" }}
-                    onClick={this.onDeleteClick.bind(this, account._id)}
-                    className="btn btn-small btn-floating waves-effect waves-light hoverable red accent-3"
-                >
-                    <i className="material-icons">delete</i>
-                </button>
-                <b>{account.institutionName}</b>
-            </li>
-        ));
-        // Setting up data table
-        const transactionsColumns = [
-            { title: "Account", field: "account" },
-            { title: "Date", field: "date", type: "date", defaultSort: "desc" },
-            { title: "Name", field: "name" },
-            { title: "Amount", field: "amount" },
-            { title: "Category", field: "category" }
-        ];
-        let transactionsData = [];
-        transactions.forEach(function (account) {
-            account.transactions.forEach(function (transaction) {
-                transactionsData.push({
-                    account: account.accountName,
-                    date: transaction.date,
-                    category: transaction.category[0],
-                    name: transaction.name,
-                    amount: transaction.amount
-                });
+
+
+
+    const accountItems = accounts.map(account => (
+        <li key={account._id} style={{ marginTop: "1rem" }}>
+            <button
+                style={{ marginRight: "1rem" }}
+                onClick={() => onDeleteClick(account._id)}
+                className="btn btn-small btn-floating waves-effect waves-light hoverable red accent-3"
+            >
+                <i className="material-icons">delete</i>
+            </button>
+            <b>{account.institutionName}</b>
+        </li>
+    ));
+
+    const totalAmount = transactions => {
+        let total = 0
+        transactions.forEach(item => {
+            total += item.amount
+        })
+
+
+        return total;
+    }
+
+    let transactionsData = [];
+    transactions.forEach(function (account) {
+        account.transactions.forEach(function (transaction) {
+            transactionsData.push({
+                account: account.accountName,
+                date: transaction.date,
+                category: transaction.category[0],
+                name: transaction.name,
+                amount: transaction.amount
             });
         });
+    });
 
-        console.log('transaction data', transactionsData)
-        return (
-            <div className="row">
-                <div className="col s12">
-                    <button
-                        onClick={this.onLogoutClick}
-                        className="btn-flat waves-effect"
-                    >
-                        <i className="material-icons left">keyboard_backspace</i> Log Out
+    return (
+        <div className="row">
+            <div className="col s12">
+                <button
+                    onClick={onLogoutClick}
+                    className="btn-flat waves-effect"
+                >
+                    <i className="material-icons left">keyboard_backspace</i> Log Out
           </button>
-                    <h4>
-                        <b>Welcome!</b>
-                    </h4>
-                    <p className="grey-text text-darken-1">
-                        Hey there, {user.name.split(" ")[0]}
-                    </p>
-                    <h5>
-                        <b>Linked Accounts</b>
-                    </h5>
-                    <p className="grey-text text-darken-1">
-                        Add or remove your bank accounts below
+                <h4>
+                    <b>Welcome!</b>
+                </h4>
+
+                <p className="grey-text text-darken-1">
+                    Hey there, {user.name.split(" ")[0]}
+                </p>
+
+                <h5>
+                    <b>Linked Accounts</b>
+                </h5>
+                <p className="grey-text text-darken-1">
+                    Add or remove your bank accounts below
           </p>
-                    <ul>{accountItems}</ul>
-                    <PlaidLinkButton
-                        buttonProps={{
-                            className:
-                                "btn btn-large waves-effect waves-light hoverable blue accent-3 main-btn"
-                        }}
-                        plaidLinkProps={{
-                            clientName: "YOUR_APP_NAME",
-                            key: "YOUR_PLAID_PUBLIC_KEY",
-                            env: "sandbox",
-                            product: ["transactions"],
-                            onSuccess: this.handleOnSuccess
-                        }}
-                        onScriptLoad={() => this.setState({ loaded: true })}
-                    >
-                        Add Account
+                <ul>{accountItems}</ul>
+                <PlaidLinkButton
+                    buttonProps={{
+                        className:
+                            "btn btn-large waves-effect waves-light hoverable blue accent-3 main-btn"
+                    }}
+                    plaidLinkProps={{
+                        clientName: "YOUR_APP_NAME",
+                        key: "YOUR_PLAID_PUBLIC_KEY",
+                        env: "sandbox",
+                        product: ["transactions"],
+                        onSuccess: handleOnSuccess
+                    }}
+                    onScriptLoad={() => setLoaded(true)}
+                >
+                    Add Account
           </PlaidLinkButton>
-                    <hr style={{ marginTop: "2rem", opacity: ".2" }} />
-                    <h5>
-                        <b>Transactions</b>
-                    </h5>
-                    {transactionsLoading ? (
-                        <p className="grey-text text-darken-1">Fetching transactions...</p>
-                    ) : (
-                            <>
-                                <p className="grey-text text-darken-1">
-                                    You have <b>{transactionsData.length}</b> transactions from your
+
+                <hr style={{ marginTop: "2rem", opacity: ".2" }} />
+                <h5>
+                    <b>Transactions</b>
+                </h5>
+                {transactionsLoading ? (
+                    <p className="grey-text text-darken-1">Fetching transactions...</p>
+                ) : (
+                        <>
+                            <p className="grey-text text-darken-1">
+                                You have <b>{transactionsData.length}</b> transactions from your
                 <b> {accounts.length}</b> linked
                 {accounts.length > 1 ? (
-                                        <span> accounts </span>
-                                    ) : (
-                                            <span> account </span>
-                                        )}
-                                    from the past 30 days
+                                    <span> accounts </span>
+                                ) : (
+                                        <span> account </span>
+                                    )}
+                                from the past 30 days
               </p>
-                                {transactionsData.map(data => (<div>{`$${data.amount}`}</div>))}
-                                {/* <MaterialTable
-                                    columns={transactionsColumns}
-                                    data={transactionsData}
-                                    title="Search Transactions"
-                                /> */}
-                            </>
-                        )}
-                </div>
+                            <h3> You have spent </h3>
+                            <h4 >{`$${totalAmount(transactionsData)}`}</h4>
+                            <div
+                                style={
+                                    {
+                                        display: 'flex',
+                                        justifyContent: 'center',
+                                        marginLeft: 'auto',
+                                        marginRight: 'auto',
+                                        width: '350px',
+                                        height: '200px'
+                                    }} >
+                                <CircleProgress value={totalAmount(transactionsData)} maxValue={2000} text={`${Math.round((totalAmount(transactionsData) / 2000) * 100)}`} />
+                            </div>
+                            <TransactionsTable transactionsData={transactionsData} />
+                        </>
+                    )}
             </div>
-        );
-    }
+        </div>
+    );
+
 }
 Accounts.propTypes = {
     logoutUser: PropTypes.func.isRequired,
