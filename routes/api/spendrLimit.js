@@ -15,7 +15,6 @@ router.post('/add', (req, res) => {
     };
     const options = { returnNewDocument: true };
 
-    console.log('hit api');
     SpendrLimit.findOneAndUpdate(query, update, options)
         .then(updatedDocument => {
             if (updatedDocument) {
