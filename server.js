@@ -1,35 +1,40 @@
-const express = require("express");
-const mongoose = require("mongoose");
-const bodyParser = require("body-parser");
-const passport = require("passport");
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+const passport = require('passport');
 
-const users = require("./routes/api/users");
-const plaid = require("./routes/api/plaid");
+const users = require('./routes/api/users');
+const plaid = require('./routes/api/plaid');
+const spendrLimit = require('./routes/api/spendrLimit');
 
 const app = express();
 
 // Bodyparser middleware
 app.use(
-  bodyParser.urlencoded({
-    extended: false
-  })
+    bodyParser.urlencoded({
+        extended: false,
+    })
 );
 app.use(bodyParser.json());
 
 // DB Config
-const db = require("./config/keys").mongoURI;
+const db = require('./config/keys').mongoURI;
 
-mongoose.connect(db, { useNewUrlParser: true }).then(() => console.log('MONGODB CONNECTED')).catch(err => console.log('error in this bitch', err))
+mongoose
+    .connect(db, { useNewUrlParser: true })
+    .then(() => console.log('MONGODB CONNECTED'))
+    .catch(err => console.log('error in this bitch', err));
 
 // Passport middleware
 app.use(passport.initialize());
 
 // Passport config
-require("./config/passport")(passport);
+require('./config/passport')(passport);
 
 // Routes
-app.use("/api/users", users);
-app.use("/api/plaid", plaid);
+app.use('/api/users', users);
+app.use('/api/plaid', plaid);
+app.use('/api/spendrLimit', spendrLimit);
 
 const port = process.env.PORT || 5000;
 
