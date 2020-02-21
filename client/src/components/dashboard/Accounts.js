@@ -4,7 +4,13 @@ import PlaidLinkButton from 'react-plaid-link-button';
 import { connect } from 'react-redux';
 import TransactionsTable from './components/TransactionsTable';
 import CircleProgress from './components/CircleProgress';
-import { getTransactions, addAccount, deleteAccount, setSpendrLimit } from '../../actions/accountActions';
+import {
+    getTransactions,
+    addAccount,
+    deleteAccount,
+    setSpendrLimit,
+    getSpendrLimit,
+} from '../../actions/accountActions';
 import { logoutUser } from '../../actions/authActions';
 
 const Accounts = props => {
@@ -18,15 +24,23 @@ const Accounts = props => {
         logoutUser,
         userId,
         setSpendrLimit,
+        getSpendrLimit,
     } = props;
-    const { transactions, transactionsLoading } = plaid;
+    const { transactions, transactionsLoading, limit } = plaid;
     const [loaded, setLoaded] = useState();
 
     useEffect(() => {
         getTransactions(accounts);
+
         // getSpendrLimit needs to go here
-        // setSpendrLimit(userId, 7500);
+        // setSpendrLimit(userId, 6500);
     }, []);
+
+    useEffect(() => {
+        getSpendrLimit(userId);
+    }, [limit]);
+
+    const maxLimit = limit.maxLimit;
 
     const handleOnSuccess = (token, metadata) => {
         const plaidData = {
@@ -116,6 +130,7 @@ const Accounts = props => {
                     onScriptLoad={() => setLoaded(true)}>
                     Link Account
                 </PlaidLinkButton>
+                <button onClick={() => setSpendrLimit(userId, 6500)}>set new limit</button>
 
                 <hr style={{ marginTop: '2rem', opacity: '.2' }} />
                 <h5>
@@ -131,8 +146,12 @@ const Accounts = props => {
                             {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
                             from the past 30 days
                         </p>
+
                         <h3> You have spent </h3>
                         <h4>{`$${totalAmount(transactionsData)}`}</h4>
+                        <h3> You're monthly limit is </h3>
+                        <h4>{`$${maxLimit}`}</h4>
+
                         <div
                             style={{
                                 display: 'flex',
@@ -142,11 +161,22 @@ const Accounts = props => {
                                 width: '350px',
                                 height: '200px',
                             }}>
-                            <CircleProgress
-                                value={totalAmount(transactionsData)}
-                                maxValue={5500}
-                                text={`${Math.round((totalAmount(transactionsData) / 5500) * 100)}`}
-                            />
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                <div style={{ marginRight: '15px' }}>
+                                    <CircleProgress
+                                        value={totalAmount(transactionsData)}
+                                        maxValue={maxLimit}
+                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                    />
+                                </div>
+                                <div style={{ marginLeft: '15px' }}>
+                                    <CircleProgress
+                                        value={totalAmount(transactionsData)}
+                                        maxValue={maxLimit}
+                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                    />
+                                </div>
+                            </div>
                         </div>
                         <TransactionsTable transactionsData={transactionsData} />
                     </>
@@ -170,5 +200,5 @@ const mapStateToProps = state => ({
 });
 export default connect(
     mapStateToProps,
-    { logoutUser, getTransactions, addAccount, deleteAccount, setSpendrLimit }
+    { logoutUser, getTransactions, addAccount, deleteAccount, setSpendrLimit, getSpendrLimit }
 )(Accounts);

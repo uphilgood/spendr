@@ -6,7 +6,7 @@ import {
     ACCOUNTS_LOADING,
     GET_TRANSACTIONS,
     TRANSACTIONS_LOADING,
-    // GET_SPENDR_LIMIT,
+    GET_SPENDR_LIMIT,
     SET_SPENDR_LIMIT,
 } from './types';
 
@@ -106,4 +106,12 @@ export const setSpendrLimit = (userId, limit) => dispatch => {
 };
 
 // Get Spendr limit
-export const getSpendrLimit = () => dispatch => {};
+export const getSpendrLimit = userId => dispatch => {
+    axios.get(`/api/spendrLimit/limit/${userId}`).then(res => {
+        console.log('res', res);
+        return dispatch({
+            type: SET_SPENDR_LIMIT,
+            payload: res.data,
+        });
+    });
+};

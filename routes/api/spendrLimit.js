@@ -27,11 +27,18 @@ router.post('/add', (req, res) => {
                 });
                 newLimit
                     .save()
-                    .then(user => res.json(user))
+                    .then(limit => res.json(limit))
                     .catch(err => console.log(err));
             }
         })
         .catch(err => console.error(`Failed to find and update document: ${err}`));
+});
+
+router.get('/limit/:userId', (req, res) => {
+    const query = { userId: req.params.userId };
+    SpendrLimit.findOne(query)
+        .then(limit => res.json(limit))
+        .catch(err => console.log(err));
 });
 
 module.exports = router;
