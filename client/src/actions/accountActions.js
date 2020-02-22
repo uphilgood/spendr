@@ -6,7 +6,6 @@ import {
     ACCOUNTS_LOADING,
     GET_TRANSACTIONS,
     TRANSACTIONS_LOADING,
-    GET_SPENDR_LIMIT,
     SET_SPENDR_LIMIT,
 } from './types';
 
@@ -70,22 +69,20 @@ export const setAccountsLoading = () => {
 };
 
 // Get Transactions
-export const getTransactions = plaidData => dispatch => {
+export const getTransactions = plaidData => async dispatch => {
     dispatch(setTransactionsLoading());
-    axios
-        .post('/api/plaid/accounts/transactions', plaidData)
-        .then(res =>
-            dispatch({
-                type: GET_TRANSACTIONS,
-                payload: res.data,
-            })
-        )
-        .catch(err =>
-            dispatch({
-                type: GET_TRANSACTIONS,
-                payload: null,
-            })
-        );
+    const transactions = await axios
+        .post('/api/plaid/accounts/transactions', plaidData).then(data => data).catch(err => dispatch({
+            type: GET_TRANSACTIONS,
+            payload: null,
+        }));
+
+    dispatch({
+        type: GET_TRANSACTIONS,
+        payload: transactions.data,
+    })
+
+
 };
 // Transactions loading
 export const setTransactionsLoading = () => {
@@ -95,9 +92,9 @@ export const setTransactionsLoading = () => {
 };
 
 // Set Spendr limit
-export const setSpendrLimit = (userId, limit) => dispatch => {
-    // make call to spendr limit backend, get response and dispatch to reducer to store in redux store
-    axios.post('/api/spendrLimit/add', { userId, limit }).then(res =>
+export const setSpendrLimit = (userId, limit) => async dispatch => {
+
+    await axios.post('/api/spendrLimit/add', { userId, limit }).then(res =>
         dispatch({
             type: SET_SPENDR_LIMIT,
             payload: res.data,
@@ -106,12 +103,13 @@ export const setSpendrLimit = (userId, limit) => dispatch => {
 };
 
 // Get Spendr limit
-export const getSpendrLimit = userId => dispatch => {
-    axios.get(`/api/spendrLimit/limit/${userId}`).then(res => {
-        console.log('res', res);
-        return dispatch({
-            type: SET_SPENDR_LIMIT,
-            payload: res.data,
-        });
+export const getSpendrLimit = userId => async dispatch => {
+    const limit = await axios.get(`/api/spendrLimit/limit/${userId}`)
+        .then(res => res)
+        .catch(err => console.log(err));
+
+    return dispatch({
+        type: SET_SPENDR_LIMIT,
+        payload: limit.data,
     });
 };

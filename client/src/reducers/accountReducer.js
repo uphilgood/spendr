@@ -16,7 +16,7 @@ const initialState = {
     limit: 0,
 };
 
-export default function(state = initialState, action) {
+export default function (state = initialState, action) {
     switch (action.type) {
         case ACCOUNTS_LOADING:
             return {
@@ -53,7 +53,7 @@ export default function(state = initialState, action) {
         case SET_SPENDR_LIMIT:
             return {
                 ...state,
-                limit: action.payload,
+                limit: action.payload.maxLimit,
             };
         default:
             return state;

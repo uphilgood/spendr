@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlaidLinkButton from 'react-plaid-link-button';
+import { InputLabel, Input, InputAdornment, FormControl, Button, Icon } from '@material-ui/core';
+import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import TransactionsTable from './components/TransactionsTable';
 import CircleProgress from './components/CircleProgress';
@@ -28,19 +30,25 @@ const Accounts = props => {
     } = props;
     const { transactions, transactionsLoading, limit } = plaid;
     const [loaded, setLoaded] = useState();
+    const [inputValue, setInputValue] = useState('');
 
     useEffect(() => {
         getTransactions(accounts);
-
-        // getSpendrLimit needs to go here
-        // setSpendrLimit(userId, 6500);
     }, []);
 
     useEffect(() => {
         getSpendrLimit(userId);
     }, [limit]);
 
-    const maxLimit = limit.maxLimit;
+    const useStyles = makeStyles(theme => ({
+        margin: {
+            margin: theme.spacing(1),
+        },
+    }));
+
+    const classes = useStyles();
+
+    const maxLimit = limit;
 
     const handleOnSuccess = (token, metadata) => {
         const plaidData = {
@@ -87,8 +95,8 @@ const Accounts = props => {
     };
 
     let transactionsData = [];
-    transactions.forEach(function(account) {
-        account.transactions.forEach(function(transaction) {
+    transactions.forEach(function (account) {
+        account.transactions.forEach(function (transaction) {
             transactionsData.push({
                 account: account.accountName,
                 date: transaction.date,
@@ -130,7 +138,6 @@ const Accounts = props => {
                     onScriptLoad={() => setLoaded(true)}>
                     Link Account
                 </PlaidLinkButton>
-                <button onClick={() => setSpendrLimit(userId, 6500)}>set new limit</button>
 
                 <hr style={{ marginTop: '2rem', opacity: '.2' }} />
                 <h5>
@@ -139,48 +146,68 @@ const Accounts = props => {
                 {transactionsLoading ? (
                     <p className="grey-text text-darken-1">Fetching transactions...</p>
                 ) : (
-                    <>
-                        <p className="grey-text text-darken-1">
-                            You have <b>{transactionsData.length}</b> transactions from your
+                        <>
+                            <p className="grey-text text-darken-1">
+                                You have <b>{transactionsData.length}</b> transactions from your
                             <b> {accounts.length}</b> linked
                             {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
-                            from the past 30 days
+                                from the past 30 days
                         </p>
 
-                        <h3> You have spent </h3>
-                        <h4>{`$${totalAmount(transactionsData)}`}</h4>
-                        <h3> You're monthly limit is </h3>
-                        <h4>{`$${maxLimit}`}</h4>
+                            <h3> You have spent </h3>
+                            <h4>{`$${totalAmount(transactionsData)}`}</h4>
+                            <h3> You're monthly limit is </h3>
+                            <h4>{`$${maxLimit}`}</h4>
 
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                marginLeft: 'auto',
-                                marginRight: 'auto',
-                                width: '350px',
-                                height: '200px',
-                            }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <div style={{ marginRight: '15px' }}>
-                                    <CircleProgress
-                                        value={totalAmount(transactionsData)}
-                                        maxValue={maxLimit}
-                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                    />
-                                </div>
-                                <div style={{ marginLeft: '15px' }}>
-                                    <CircleProgress
-                                        value={totalAmount(transactionsData)}
-                                        maxValue={maxLimit}
-                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                    />
+                            <FormControl className={classes.margin} >
+                                <InputLabel htmlFor="standard-adornment-amount">Amount</InputLabel>
+                                <Input
+                                    disableUnderline={true}
+                                    id="standard-adornment-amount"
+                                    value={inputValue}
+                                    onChange={(e) => setInputValue(e.target.value)}
+                                    startAdornment={<InputAdornment position="start">$</InputAdornment>}
+                                />
+                            </FormControl>
+                            <Button
+                                variant="contained"
+                                color="primary"
+                                className={classes.button}
+                                endIcon={<Icon>send</Icon>}
+                                onClick={() => setSpendrLimit(userId, inputValue)}
+                            >
+                                Set Limit
+                            </Button>
+
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    marginLeft: 'auto',
+                                    marginRight: 'auto',
+                                    width: '350px',
+                                    height: '200px',
+                                }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <div style={{ marginRight: '15px' }}>
+                                        <CircleProgress
+                                            value={totalAmount(transactionsData)}
+                                            maxValue={maxLimit}
+                                            text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                        />
+                                    </div>
+                                    <div style={{ marginLeft: '15px' }}>
+                                        <CircleProgress
+                                            value={totalAmount(transactionsData)}
+                                            maxValue={maxLimit}
+                                            text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                        />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                        <TransactionsTable transactionsData={transactionsData} />
-                    </>
-                )}
+                            <TransactionsTable transactionsData={transactionsData} />
+                        </>
+                    )}
             </div>
         </div>
     );

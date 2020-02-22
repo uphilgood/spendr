@@ -13,7 +13,7 @@ router.post('/add', (req, res) => {
             maxLimit: limit,
         },
     };
-    const options = { returnNewDocument: true };
+    const options = { new: true };
 
     SpendrLimit.findOneAndUpdate(query, update, options)
         .then(updatedDocument => {
