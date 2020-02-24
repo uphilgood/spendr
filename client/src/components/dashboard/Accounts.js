@@ -6,6 +6,10 @@ import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import TransactionsTable from './components/TransactionsTable';
 import CircleProgress from './components/CircleProgress';
+import FlatButton from './components/FlatButton';
+import AccountItems from './components/AccountItems';
+import CardImageRenderer from './components/CardImageRenderer';
+import CardMedia from "@material-ui/core/CardMedia";
 import {
     getTransactions,
     addAccount,
@@ -46,6 +50,9 @@ const Accounts = props => {
         },
     }));
 
+    console.log('plaid', plaid)
+    console.log('accounts', accounts)
+
     const classes = useStyles();
 
     const maxLimit = limit;
@@ -71,18 +78,6 @@ const Accounts = props => {
         e.preventDefault();
         logoutUser();
     };
-
-    const accountItems = accounts.map(account => (
-        <li key={account._id} style={{ marginTop: '1rem' }}>
-            <button
-                style={{ marginRight: '1rem' }}
-                onClick={() => onDeleteClick(account._id)}
-                className="btn btn-small btn-floating waves-effect waves-light hoverable red accent-3">
-                <i className="material-icons">delete</i>
-            </button>
-            <b>{account.institutionName}</b>
-        </li>
-    ));
 
     const totalAmount = transactions => {
         let total = 0;
@@ -110,9 +105,7 @@ const Accounts = props => {
     return (
         <div className="row">
             <div className="col s12">
-                <button onClick={onLogoutClick} className="btn-flat waves-effect">
-                    <i className="material-icons left">keyboard_backspace</i> Log Out
-                </button>
+                <FlatButton onClick={onLogoutClick} icon={'keyboard_backspace'} text={'Log Out'} />
                 <h4>
                     <b>Welcome!</b>
                 </h4>
@@ -123,7 +116,7 @@ const Accounts = props => {
                     <b>Linked Accounts</b>
                 </h5>
                 <p className="grey-text text-darken-1">Add or remove your bank accounts below</p>
-                <ul>{accountItems}</ul>
+                <ul><AccountItems accounts={accounts} callback={onDeleteClick} /></ul>
                 <PlaidLinkButton
                     buttonProps={{
                         className: 'btn btn-large waves-effect waves-light hoverable blue accent-3 main-btn',
@@ -153,7 +146,7 @@ const Accounts = props => {
                             {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
                                 from the past 30 days
                         </p>
-
+                            <CardImageRenderer plaid={plaid} />
                             <h3> You have spent </h3>
                             <h4>{`$${totalAmount(transactionsData)}`}</h4>
                             <h3> You're monthly limit is </h3>
