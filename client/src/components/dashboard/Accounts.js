@@ -182,20 +182,13 @@ const Accounts = props => {
                                     height: '200px',
                                 }}>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                    <div style={{ marginRight: '15px' }}>
-                                        <CircleProgress
-                                            value={totalAmount(transactionsData)}
-                                            maxValue={maxLimit}
-                                            text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                        />
-                                    </div>
-                                    <div style={{ marginLeft: '15px' }}>
-                                        <CircleProgress
-                                            value={totalAmount(transactionsData)}
-                                            maxValue={maxLimit}
-                                            text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                        />
-                                    </div>
+
+                                    <CircleProgress
+                                        value={totalAmount(transactionsData)}
+                                        maxValue={maxLimit}
+                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                    />
+
                                 </div>
                             </div>
                             <TransactionsTable transactionsData={transactionsData} />
