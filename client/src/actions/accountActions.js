@@ -69,7 +69,7 @@ export const setAccountsLoading = () => {
 };
 
 // Get Transactions
-export const getTransactions = plaidData => async dispatch => {
+export const getTransactions = (plaidData, type, full = true) => async dispatch => {
     dispatch(setTransactionsLoading());
     const transactions = await axios
         .post('/api/plaid/accounts/transactions', plaidData).then(data => data).catch(err => dispatch({
@@ -77,9 +77,10 @@ export const getTransactions = plaidData => async dispatch => {
             payload: null,
         }));
 
+    const filteredTransactions = transactions.data.filter(data => data.accountName === type)
     dispatch({
         type: GET_TRANSACTIONS,
-        payload: transactions.data,
+        payload: full ? transactions.data : filteredTransactions,
     })
 
 

@@ -39,40 +39,37 @@ const imageMapper = {
     'Huntington': 'https://www.huntington.com/-/media/Dot_Com_Redesign/DOT-COM-ILLUSTRATIONS--IMAGES-FOR-REDESIGN/HNB-Affinity-Cards/affinity-card-cleveland-state-alt.jpg?rev=1fb2d0bab72d49dcbe9cf4b4dce43489&h=173&w=275&la=en&hash=9542606362CB7F3E07C1D913879E6FB7',
 }
 
-const CardImageRenderer = ({ plaid }) => {
-    const { transactions } = plaid;
+const CardImageRenderer = ({ accounts, onClick }) => {
 
     const classes = useStyles();
 
-    const Cards = ({ transactions }) => {
+    const Cards = React.memo(({ accounts }) => {
+
+
         return (
-            transactions.map(account => (
+            accounts.map(account => (
                 <div style={{ display: 'grid' }}>
                     <Card className={classes.root} style={{ marginRight: '16px' }}>
-                        <CardActionArea onClick={() => alert('hello')}>
+                        <CardActionArea onClick={() => onClick(account.institutionName)}>
                             <CardMedia
                                 className={classes.media}
-                                image={imageMapper[account.accountName]}
-                                title={account.accountName}
+                                image={imageMapper[account.institutionName]}
+                                title={account.institutionName}
                             />
                         </CardActionArea>
                     </Card>
-                    <p className="grey-text text-darken-1">
-                        Total Spent: $506
-                </p>
                 </div>
             ))
         )
-    }
+    })
 
     return (
         <div style={{ width: '100%' }}>
             <Box display="flex">
-                <Cards transactions={transactions} />
+                <Cards accounts={accounts} />
             </Box>
         </div>
     )
-
 }
 
 export default CardImageRenderer;
