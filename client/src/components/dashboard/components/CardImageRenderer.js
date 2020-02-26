@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { makeStyles } from "@material-ui/core/styles";
 import Card from "@material-ui/core/Card";
 import CardMedia from "@material-ui/core/CardMedia";
@@ -39,29 +39,31 @@ const imageMapper = {
     'Huntington': 'https://www.huntington.com/-/media/Dot_Com_Redesign/DOT-COM-ILLUSTRATIONS--IMAGES-FOR-REDESIGN/HNB-Affinity-Cards/affinity-card-cleveland-state-alt.jpg?rev=1fb2d0bab72d49dcbe9cf4b4dce43489&h=173&w=275&la=en&hash=9542606362CB7F3E07C1D913879E6FB7',
 }
 
+
 const CardImageRenderer = ({ accounts, onClick }) => {
+
+    console.log('rerendered')
 
     const classes = useStyles();
 
-    const Cards = React.memo(({ accounts }) => {
-
-
-        return (
-            accounts.map(account => (
+    const Cards = ({ accounts }) => (
+        accounts.map(account => {
+            const getImage = useMemo(institutionName => imageMapper[account.institutionName], [accounts]);
+            return (
                 <div style={{ display: 'grid' }}>
                     <Card className={classes.root} style={{ marginRight: '16px' }}>
                         <CardActionArea onClick={() => onClick(account.institutionName)}>
                             <CardMedia
                                 className={classes.media}
-                                image={imageMapper[account.institutionName]}
+                                image={getImage}
                                 title={account.institutionName}
                             />
                         </CardActionArea>
                     </Card>
                 </div>
-            ))
-        )
-    })
+            )
+        })
+    )
 
     return (
         <div style={{ width: '100%' }}>

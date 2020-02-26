@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
+import uniqid from 'uniqid';
 import Table from '@material-ui/core/Table';
 import TableBody from '@material-ui/core/TableBody';
 import TableCell from '@material-ui/core/TableCell';
@@ -8,15 +9,19 @@ import TableRow from '@material-ui/core/TableRow';
 import Paper from '@material-ui/core/Paper';
 
 const TransactionsTable = ({ transactionsData }) => {
+    const [transactionRows, setTransactionRows] = useState([]);
     const transactionsColumns = ["Account", "Date", "Name", "Amount", "Category"];
 
     const createData = (account, date, name, amount, category) => {
         return { account, date, name, amount, category };
     }
 
-    const transactionRows = transactionsData.map(data => {
-        return createData(data.account, data.date, data.name, data.amount, data.category)
-    })
+    useEffect(() => {
+        const transactions = transactionsData.map(data => {
+            return createData(data.account, data.date, data.name, data.amount, data.category)
+        })
+        setTransactionRows(transactions)
+    }, [transactionsData])
 
     return (
         <TableContainer component={Paper}>
@@ -28,7 +33,7 @@ const TransactionsTable = ({ transactionsData }) => {
                 </TableHead>
                 <TableBody>
                     {transactionRows.map(row => (
-                        <TableRow key={row.account}>
+                        <TableRow key={uniqid()}>
                             <TableCell component="th" scope="row">
                                 {row.account}
                             </TableCell>

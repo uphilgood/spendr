@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import PlaidLinkButton from 'react-plaid-link-button';
-import { InputLabel, Input, InputAdornment, FormControl, Button, Icon } from '@material-ui/core';
-import { makeStyles } from '@material-ui/core/styles';
 import { connect } from 'react-redux';
 import TransactionsTable from './components/TransactionsTable';
 import CircleProgress from './components/CircleProgress';
 import FlatButton from './components/FlatButton';
 import AccountItems from './components/AccountItems';
 import CardImageRenderer from './components/CardImageRenderer';
+import InputFormWithButton from './components/InputFormWithButton';
 import {
     getTransactions,
     addAccount,
@@ -33,7 +32,6 @@ const Accounts = props => {
     } = props;
     const { transactions, transactionsLoading, limit } = plaid;
     const [loaded, setLoaded] = useState();
-    const [inputValue, setInputValue] = useState('');
     const [type, setType] = useState(accounts[0].institutionName);
 
     useEffect(() => {
@@ -43,14 +41,6 @@ const Accounts = props => {
     useEffect(() => {
         getSpendrLimit(userId);
     }, [limit]);
-
-    const useStyles = makeStyles(theme => ({
-        margin: {
-            margin: theme.spacing(1),
-        },
-    }));
-
-    const classes = useStyles();
 
     const maxLimit = limit;
 
@@ -133,47 +123,31 @@ const Accounts = props => {
                 <h5>
                     <b>Transactions</b>
                 </h5>
+
+                <p className="grey-text text-darken-1">
+                    You have <b>{transactionsData.length}</b> transactions from your
+                            <b> {accounts.length}</b> linked
+                            {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
+                    from the past 30 days
+                            </p>
+                <p>
+                    <span>You have spent <b>{`$${totalAmount(transactionsData)}`}</b></span>
+                </p>
+                <p>
+                    <span>Your monthly limit is <b>{`$${maxLimit}`}</b></span>
+                </p>
+                <CardImageRenderer accounts={accounts} onClick={type => setType(type)} transactions={transactionsData} />
+                <InputFormWithButton
+                    userId={userId}
+                    handleClick={setSpendrLimit}
+                    inputLabel={'Set Max Limit'}
+                    buttonText={'Set Limit'}
+                    buttonIcon={'send'}
+                />
                 {transactionsLoading ? (
                     <p className="grey-text text-darken-1">Fetching transactions...</p>
                 ) : (
                         <>
-                            <p className="grey-text text-darken-1">
-                                You have <b>{transactionsData.length}</b> transactions from your
-                            <b> {accounts.length}</b> linked
-                            {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
-                                from the past 30 days
-                            </p>
-                            <p>
-                                <span>You have spent <b>{`$${totalAmount(transactionsData)}`}</b></span>
-                            </p>
-                            <p>
-                                <span>Your monthly limit is <b>{`$${maxLimit}`}</b></span>
-                            </p>
-                            <CardImageRenderer accounts={accounts} onClick={type => setType(type)} transactions={transactionsData} />
-
-                            <div style={{ marginTop: '25px' }}>
-                                <FormControl className={classes.margin} >
-                                    <InputLabel htmlFor="standard-adornment-amount">Set Max Limit</InputLabel>
-                                    <Input
-                                        disableUnderline={true}
-                                        placeholder={'Enter Limit'}
-                                        id="standard-adornment-amount"
-                                        value={inputValue}
-                                        onChange={(e) => setInputValue(e.target.value)}
-                                        startAdornment={<InputAdornment position="start">$</InputAdornment>}
-                                    />
-                                </FormControl>
-                                <Button
-                                    variant="contained"
-                                    color="primary"
-                                    className={classes.button}
-                                    endIcon={<Icon>send</Icon>}
-                                    onClick={() => setSpendrLimit(userId, inputValue)}
-                                >
-                                    Set Limit
-                            </Button>
-                            </div>
-
                             <div
                                 style={{
                                     display: 'flex',
