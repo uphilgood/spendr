@@ -1,6 +1,6 @@
 # mern-auth
 
-![Final App](https://gph.is/g/46v7ewY)
+![Final App](https://media.giphy.com/media/mC1l5vpCK1afTMBYaW/giphy.gif)
 Minimal full-stack MERN with Plaid app with authentication using passport and JWTs.
 
 This project uses the following technologies:
