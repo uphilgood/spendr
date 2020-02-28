@@ -12,7 +12,7 @@ const InputFormWithButton = ({ userId, handleClick, placeholder, inputLabel, but
     const [inputValue, setInputValue] = useState('');
     const classes = useStyles();
     return (
-        <div style={{ marginTop: '25px' }}>
+        <div style={{ display: 'inline-grid', marginTop: '25px', maxWidth: '300px' }}>
             <FormControl className={classes.margin} >
                 <InputLabel htmlFor="standard-adornment-amount">{inputLabel}</InputLabel>
                 <Input

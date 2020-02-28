@@ -7,7 +7,7 @@ import CircleProgress from './components/CircleProgress';
 import FlatButton from './components/FlatButton';
 import AccountItems from './components/AccountItems';
 import CardImageRenderer from './components/CardImageRenderer';
-import InputFormWithButton from './components/InputFormWithButton';
+// import InputFormWithButton from './components/InputFormWithButton';
 import {
     getTransactions,
     addAccount,
@@ -137,13 +137,13 @@ const Accounts = props => {
                     <span>Your monthly limit is <b>{`$${maxLimit}`}</b></span>
                 </p>
                 <CardImageRenderer accounts={accounts} onClick={type => setType(type)} transactions={transactionsData} />
-                <InputFormWithButton
+                {/* <InputFormWithButton
                     userId={userId}
                     handleClick={setSpendrLimit}
                     inputLabel={'Set Max Limit'}
                     buttonText={'Set Limit'}
                     buttonIcon={'send'}
-                />
+                /> */}
                 {transactionsLoading ? (
                     <p className="grey-text text-darken-1">Fetching transactions...</p>
                 ) : (
