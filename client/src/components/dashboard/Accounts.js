@@ -7,7 +7,6 @@ import CircleProgress from './components/CircleProgress';
 import FlatButton from './components/FlatButton';
 import AccountItems from './components/AccountItems';
 import CardImageRenderer from './components/CardImageRenderer';
-// import InputFormWithButton from './components/InputFormWithButton';
 import {
     getTransactions,
     addAccount,
@@ -27,7 +26,6 @@ const Accounts = props => {
         deleteAccount,
         logoutUser,
         userId,
-        setSpendrLimit,
         getSpendrLimit,
     } = props;
     const { transactions, transactionsLoading, limit } = plaid;
@@ -67,19 +65,14 @@ const Accounts = props => {
     };
 
     const totalAmount = transactions => {
-        let total = 0;
-        transactions.forEach(item => {
-            if (item.category !== 'Transfer') {
-                return (total += item.amount);
-            }
-        });
-        return Math.round(total);
+        const total = transactions.reduce((acc, val) => acc + val.amount, 0)
+        return total.toFixed(2);
     };
 
     let transactionsData = [];
     transactions.forEach(account => {
         account.transactions.forEach(transaction => {
-            transactionsData.push({
+            transaction.category[0] !== 'Transfer' && transactionsData.push({
                 account: account.accountName,
                 date: transaction.date,
                 category: transaction.category[0],

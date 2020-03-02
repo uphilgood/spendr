@@ -42,8 +42,6 @@ const imageMapper = {
 
 const CardImageRenderer = ({ accounts, onClick }) => {
 
-    console.log('rerendered')
-
     const classes = useStyles();
 
     const Cards = ({ accounts }) => (
