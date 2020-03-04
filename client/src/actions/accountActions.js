@@ -69,21 +69,23 @@ export const setAccountsLoading = () => {
 };
 
 // Get Transactions
-export const getTransactions = (plaidData, type, full = true) => async dispatch => {
+export const getTransactions = (plaidData, type, full = true, dateRange) => async dispatch => {
     dispatch(setTransactionsLoading());
     const transactions = await axios
-        .post('/api/plaid/accounts/transactions', plaidData).then(data => data).catch(err => dispatch({
-            type: GET_TRANSACTIONS,
-            payload: null,
-        }));
+        .post('/api/plaid/accounts/transactions', { plaidData, dateRange })
+        .then(data => data)
+        .catch(err =>
+            dispatch({
+                type: GET_TRANSACTIONS,
+                payload: null,
+            })
+        );
 
-    const filteredTransactions = transactions.data.filter(data => data.accountName === type)
+    const filteredTransactions = transactions.data.filter(data => data.accountName === type);
     dispatch({
         type: GET_TRANSACTIONS,
         payload: full ? transactions.data : filteredTransactions,
-    })
-
-
+    });
 };
 // Transactions loading
 export const setTransactionsLoading = () => {
@@ -94,7 +96,6 @@ export const setTransactionsLoading = () => {
 
 // Set Spendr limit
 export const setSpendrLimit = (userId, limit) => async dispatch => {
-
     await axios.post('/api/spendrLimit/add', { userId, limit }).then(res =>
         dispatch({
             type: SET_SPENDR_LIMIT,
@@ -105,7 +106,8 @@ export const setSpendrLimit = (userId, limit) => async dispatch => {
 
 // Get Spendr limit
 export const getSpendrLimit = userId => async dispatch => {
-    const limit = await axios.get(`/api/spendrLimit/limit/${userId}`)
+    const limit = await axios
+        .get(`/api/spendrLimit/limit/${userId}`)
         .then(res => res)
         .catch(err => console.log(err));
 

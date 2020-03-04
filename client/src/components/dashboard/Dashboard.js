@@ -2,18 +2,19 @@ import React, { useState, useEffect } from 'react';
 import PlaidLinkButton from 'react-plaid-link-button';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
-import { logoutUser } from '../../actions/authActions';
+import { logoutUser, getDateRange } from '../../actions/authActions';
 import { getAccounts, addAccount } from '../../actions/accountActions';
 import Accounts from './Accounts';
 import Spinner from './Spinner';
 
-const Dashboard = ({ getAccounts, logoutUser, auth, plaid }) => {
+const Dashboard = ({ getAccounts, logoutUser, auth, plaid, getDateRange }) => {
     const [loaded, setLoaded] = useState();
-    const { user } = auth;
+    const { user, startDate, endDate } = auth;
     const { accounts, accountsLoading } = plaid;
 
     useEffect(() => {
         getAccounts();
+        getDateRange(user.email);
     }, []);
 
     // Logout
@@ -31,13 +32,15 @@ const Dashboard = ({ getAccounts, logoutUser, auth, plaid }) => {
         addAccount(plaidData);
     };
 
+    const dateRange = { startDate: auth.startDate, endDate: auth.endDate };
+
     let dashboardContent;
 
     if (accounts === null || accountsLoading) {
         dashboardContent = <Spinner />;
     } else if (accounts.length > 0) {
         // User has accounts linked
-        dashboardContent = <Accounts user={user} accounts={accounts} />;
+        dashboardContent = <Accounts user={user} accounts={accounts} dateRange={dateRange} />;
     } else {
         // User has no accounts linked
         dashboardContent = (
@@ -89,5 +92,5 @@ const mapStateToProps = state => ({
 });
 export default connect(
     mapStateToProps,
-    { logoutUser, getAccounts, addAccount }
+    { logoutUser, getAccounts, addAccount, getDateRange }
 )(Dashboard);

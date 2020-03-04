@@ -115,20 +115,24 @@ router.post(
         const today = now.format('YYYY-MM-DD');
         const thirtyDaysAgo = now.subtract(30, 'days').format('YYYY-MM-DD'); // Change this if you want more transactions
         let transactions = [];
-        const accounts = req.body;
-        if (accounts) {
-            accounts.forEach(function(account) {
+        const { plaidData, dateRange } = req.body;
+
+        const startDate = moment(dateRange.startDate).format('YYYY-MM-DD');
+        const endDate = moment(dateRange.endDate).format('YYYY-MM-DD');
+
+        if (plaidData) {
+            plaidData.forEach(function(account) {
                 ACCESS_TOKEN = account.accessToken;
                 const institutionName = account.institutionName;
                 client
-                    .getTransactions(ACCESS_TOKEN, thirtyDaysAgo, today)
+                    .getTransactions(ACCESS_TOKEN, startDate, endDate)
                     .then(response => {
                         transactions.push({
                             accountName: institutionName,
                             transactions: response.transactions,
                         });
                         // Don't send back response till all transactions have been added
-                        if (transactions.length === accounts.length) {
+                        if (transactions.length === plaidData.length) {
                             res.json(transactions);
                         }
                     })

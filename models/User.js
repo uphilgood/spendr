@@ -19,6 +19,12 @@ const UserSchema = new Schema({
         type: Date,
         default: Date.now,
     },
+    startDate: {
+        type: Date,
+    },
+    endDate: {
+        type: Date,
+    },
 });
 
 module.exports = User = mongoose.model('users', UserSchema);

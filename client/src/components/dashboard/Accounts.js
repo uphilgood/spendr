@@ -27,13 +27,14 @@ const Accounts = props => {
         logoutUser,
         userId,
         getSpendrLimit,
+        dateRange,
     } = props;
     const { transactions, transactionsLoading, limit } = plaid;
     const [loaded, setLoaded] = useState();
     const [type, setType] = useState(accounts[0].institutionName);
 
     useEffect(() => {
-        getTransactions(accounts, type, false);
+        getTransactions(accounts, type, false, dateRange);
     }, [type]);
 
     useEffect(() => {
@@ -65,20 +66,21 @@ const Accounts = props => {
     };
 
     const totalAmount = transactions => {
-        const total = transactions.reduce((acc, val) => acc + val.amount, 0)
+        const total = transactions.reduce((acc, val) => acc + val.amount, 0);
         return total.toFixed(2);
     };
 
     let transactionsData = [];
     transactions.forEach(account => {
         account.transactions.forEach(transaction => {
-            transaction.category[0] !== 'Transfer' && transactionsData.push({
-                account: account.accountName,
-                date: transaction.date,
-                category: transaction.category[0],
-                name: transaction.name,
-                amount: transaction.amount,
-            });
+            transaction.category[0] !== 'Transfer' &&
+                transactionsData.push({
+                    account: account.accountName,
+                    date: transaction.date,
+                    category: transaction.category[0],
+                    name: transaction.name,
+                    amount: transaction.amount,
+                });
         });
     });
 
@@ -96,7 +98,9 @@ const Accounts = props => {
                     <b>Linked Accounts</b>
                 </h5>
                 <p className="grey-text text-darken-1">Add or remove your bank accounts below</p>
-                <ul><AccountItems accounts={accounts} callback={onDeleteClick} /></ul>
+                <ul>
+                    <AccountItems accounts={accounts} callback={onDeleteClick} />
+                </ul>
                 <PlaidLinkButton
                     buttonProps={{
                         className: 'btn btn-large waves-effect waves-light hoverable blue accent-3 main-btn',
@@ -119,17 +123,25 @@ const Accounts = props => {
 
                 <p className="grey-text text-darken-1">
                     You have <b>{transactionsData.length}</b> transactions from your
-                            <b> {accounts.length}</b> linked
-                            {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
+                    <b> {accounts.length}</b> linked
+                    {accounts.length > 1 ? <span> accounts </span> : <span> account </span>}
                     from the past 30 days
-                            </p>
-                <p>
-                    <span>You have spent <b>{`$${totalAmount(transactionsData)}`}</b></span>
                 </p>
                 <p>
-                    <span>Your monthly limit is <b>{`$${maxLimit}`}</b></span>
+                    <span>
+                        You have spent <b>{`$${totalAmount(transactionsData)}`}</b>
+                    </span>
                 </p>
-                <CardImageRenderer accounts={accounts} onClick={type => setType(type)} transactions={transactionsData} />
+                <p>
+                    <span>
+                        Your monthly limit is <b>{`$${maxLimit}`}</b>
+                    </span>
+                </p>
+                <CardImageRenderer
+                    accounts={accounts}
+                    onClick={type => setType(type)}
+                    transactions={transactionsData}
+                />
                 {/* <InputFormWithButton
                     userId={userId}
                     handleClick={setSpendrLimit}
@@ -140,29 +152,27 @@ const Accounts = props => {
                 {transactionsLoading ? (
                     <p className="grey-text text-darken-1">Fetching transactions...</p>
                 ) : (
-                        <>
-                            <div
-                                style={{
-                                    display: 'flex',
-                                    justifyContent: 'center',
-                                    marginLeft: 'auto',
-                                    marginRight: 'auto',
-                                    width: '350px',
-                                    height: '200px',
-                                }}>
-                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-
-                                    <CircleProgress
-                                        value={totalAmount(transactionsData)}
-                                        maxValue={maxLimit}
-                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                    />
-
-                                </div>
+                    <>
+                        <div
+                            style={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                marginLeft: 'auto',
+                                marginRight: 'auto',
+                                width: '350px',
+                                height: '200px',
+                            }}>
+                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                <CircleProgress
+                                    value={totalAmount(transactionsData)}
+                                    maxValue={maxLimit}
+                                    text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                />
                             </div>
-                            <TransactionsTable transactionsData={transactionsData} />
-                        </>
-                    )}
+                        </div>
+                        <TransactionsTable transactionsData={transactionsData} />
+                    </>
+                )}
             </div>
         </div>
     );
