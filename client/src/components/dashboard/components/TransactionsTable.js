@@ -10,7 +10,7 @@ import Paper from '@material-ui/core/Paper';
 
 const TransactionsTable = ({ transactionsData }) => {
     const [transactionRows, setTransactionRows] = useState([]);
-    const transactionsColumns = ["Account", "Date", "Name", "Amount", "Category"];
+    const transactionsColumns = ["Account", "Amount", "Name", "Date", "Category"];
 
     const createData = (account, date, name, amount, category) => {
         return { account, date, name, amount, category };
@@ -48,5 +48,6 @@ const TransactionsTable = ({ transactionsData }) => {
         </TableContainer>
     )
 }
+
 
 export default TransactionsTable;

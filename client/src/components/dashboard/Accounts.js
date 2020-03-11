@@ -116,6 +116,13 @@ const Accounts = props => {
                     Link Account
                 </PlaidLinkButton>
 
+                <button
+
+                    onClick={() => { }}
+                    className="btn btn-large waves-effect waves-light hoverable light-green accent-3 ">
+                    Track Manually
+                    </button>
+
                 <hr style={{ marginTop: '2rem', opacity: '.2' }} />
                 <h5>
                     <b>Transactions</b>
@@ -152,27 +159,27 @@ const Accounts = props => {
                 {transactionsLoading ? (
                     <p className="grey-text text-darken-1">Fetching transactions...</p>
                 ) : (
-                    <>
-                        <div
-                            style={{
-                                display: 'flex',
-                                justifyContent: 'center',
-                                marginLeft: 'auto',
-                                marginRight: 'auto',
-                                width: '350px',
-                                height: '200px',
-                            }}>
-                            <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
-                                <CircleProgress
-                                    value={totalAmount(transactionsData)}
-                                    maxValue={maxLimit}
-                                    text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
-                                />
+                        <>
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    justifyContent: 'center',
+                                    marginLeft: 'auto',
+                                    marginRight: 'auto',
+                                    width: '350px',
+                                    height: '200px',
+                                }}>
+                                <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%' }}>
+                                    <CircleProgress
+                                        value={totalAmount(transactionsData)}
+                                        maxValue={maxLimit}
+                                        text={`${Math.round((totalAmount(transactionsData) / maxLimit) * 100)}`}
+                                    />
+                                </div>
                             </div>
-                        </div>
-                        <TransactionsTable transactionsData={transactionsData} />
-                    </>
-                )}
+                            <TransactionsTable transactionsData={transactionsData} />
+                        </>
+                    )}
             </div>
         </div>
     );

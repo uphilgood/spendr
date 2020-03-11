@@ -11,7 +11,7 @@ import { setDateRange } from '../../actions/authActions';
 // 2.  need to wire up db schema to add start/end date for budget
 // 3.  dashboard should fetch user start/end date when component mounts then use those dates to fetch transactions
 
-const Settings = ({ userId, setSpendrLimit, plaid, email, setDateRange }) => {
+const Settings = ({ userId, setSpendrLimit, plaid, email, setDateRange, history }) => {
     const [startDate, setStartDate] = useState(new Date());
     const [endDate, setEndDate] = useState(new Date());
     const [inputValue, setInputValue] = useState('');
@@ -22,6 +22,7 @@ const Settings = ({ userId, setSpendrLimit, plaid, email, setDateRange }) => {
     const handleSubmit = async () => {
         await setSpendrLimit(userId, inputValue);
         await setDateRange({ email, startDate, endDate });
+        history.push('/dashboard');
     };
 
     return (
@@ -54,9 +55,11 @@ const Settings = ({ userId, setSpendrLimit, plaid, email, setDateRange }) => {
                 placeholder={limit ? limit : 'Set Max Limit'}
                 buttonText={'Set Limit'}
             />
+
             <Button variant="contained" color="primary" endIcon={<Icon>{'send'}</Icon>} onClick={handleSubmit}>
                 Set Limit
             </Button>
+
         </div>
     );
 };
